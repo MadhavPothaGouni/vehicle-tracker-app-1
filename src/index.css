@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------
+   Visual helpers & utilities
+   --------------------------- */
+
+/* subtle dark vignette left & right (like screenshots) */
+.app-side-vignette-left,
+.app-side-vignette-right {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 72px;
+  z-index: 1400;
+  background: linear-gradient(90deg, rgba(0,0,0,0.36), rgba(0,0,0,0.12), rgba(0,0,0,0));
+}
+.app-side-vignette-left { left: 0; }
+.app-side-vignette-right { right: 0; }
+
+/* card shadow helper (strong card shadow used across UI) */
+.card-strong {
+  box-shadow: 0 18px 40px rgba(14,30,37,0.08), 0 3px 10px rgba(2,6,23,0.04);
+}
+
+/* floating FAB style */
+.fab-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 30px rgba(37,99,235,0.18);
+  transform: translateZ(0);
+}
+
+/* slider styling (styled thumb + track) */
+.input-slider,
+input[type="range"] {
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3b82f6 0%, #a5b4fc 100%);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb,
+.input-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border: 6px solid rgba(59,130,246,0.95);
+  border-radius: 50%;
+  box-shadow: 0 6px 14px rgba(59,130,246,0.18);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb,
+.input-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border: 6px solid rgba(59,130,246,0.95);
+  border-radius: 50%;
+  box-shadow: 0 6px 14px rgba(59,130,246,0.18);
+}
+
+/* vehicle icon drop shadow */
+.vehicle-icon svg { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18)); }
+
+/* softer shadows and subtle rounded map container */
+.leaflet-container {
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  background: #f9fafb;
+  z-index: 0 !important; /* ensure map stays below UI overlays */
+  outline: none;
+}
+
+/* card utility shadows */
+.shadow-2xl {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+.shadow-xl {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------------------------
+   Z-index / stacking fixes
+   --------------------------- */
+
+/*
+  We intentionally keep the map panes at z-index:0 so React UI overlays can sit above.
+  Add your overlay components the classes below (info-modal, control-panel, config-modal)
+  or rely on the generic selector (div[class*="absolute"]) as a safe fallback.
+*/
+
+/* Leaflet panes forced to zero (defensive) */
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-overlay-pane,
+.leaflet-marker-pane,
+.leaflet-shadow-pane,
+.leaflet-popup-pane {
+  z-index: 0 !important;
+}
+
+/* Preferred specific overlay classes (used by components) */
+.info-modal,
+.control-panel,
+.config-modal,
+.app-ui,
+.app-overlay {
+  position: relative; /* keep layout sane */
+  z-index: 1100 !important;
+}
+
+/* Generic fallback: any absolute-positioned element from our app should appear above the map.
+   It's conservative (only affects elements created by classes containing "absolute") */
+div[class*="absolute"] {
+  z-index: 1000 !important;
+}
+
+/* ---------------------------
+   Animations & misc
+   --------------------------- */
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.animate-slideUp { animation: slideUp 0.45s ease-out forwards; }
+
+/* Optional slider thumb glow for modern browsers */
+input[type="range"]::-webkit-slider-thumb { background: #2563eb; box-shadow: 0 0 10px rgba(37,99,235,0.45); }
+/* --- FINAL FIX: Force all React UI overlays above Leaflet map --- */
+
+/* Create an isolated stacking layer for the map root itself */
+.leaflet-container {
+  position: relative !important;
+  z-index: 0 !important;
+}
+
+/* Force all React absolute overlays above any Leaflet internal pane */
+#root > div[class*="relative"] > div[class*="absolute"],
+.info-modal,
+.control-panel,
+.config-modal,
+.app-overlay {
+  position: absolute !important;
+  z-index: 2000 !important;
+  pointer-events: auto !important;
+}
+
+/* Optional: debug helper (remove later) */
+/* .info-modal, .control-panel, .config-modal { outline: 1px solid red !important; } */
+/* --- FINAL OVERLAY STACK FIX --- */
+.control-panel,
+.config-modal {
+  position: fixed !important;
+  z-index: 5000 !important;
+  pointer-events: auto !important;
+}
+
+.control-panel {
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.config-modal {
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* --- Final Curved Pill Control Bar Styling --- */
+.control-panel {
+  position: fixed !important;
+  left: 0;
+  right: 0;
+  bottom: 36px;
+  display: flex;
+  justify-content: center;
+  z-index: 5000 !important;
+  pointer-events: none;
+}
+
+.control-panel-inner {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  border-radius: 9999px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+  transition: all 0.25s ease-in-out;
+}
+
+.control-panel-inner button {
+  font-size: 14px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.control-panel-inner button:hover {
+  transform: scale(1.04);
+}
+
+/* FAB style (blue circular button) */
+.fab-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.25);
+  transition: all 0.25s ease;
+}
+.fab-circle:hover {
+  transform: scale(1.05);
+}
+
+/* Config drawer styling (slide-up) */
+.config-modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6000 !important;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.1);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  animation: slideUp 0.4s ease-out forwards;
+}
+/* Slight floating feel for the control pill */
+.control-panel-inner {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18),
+              0 4px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* FAB highlight */
+.fab-circle {
+  background: linear-gradient(145deg, #2563eb, #3b82f6);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.35);
+}
